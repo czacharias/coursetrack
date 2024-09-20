@@ -1,4 +1,3 @@
-'use client';
 import { sql } from "@vercel/postgres";
 import { createInvoice, fetchUsers } from "@/app/lib/actions";
 
