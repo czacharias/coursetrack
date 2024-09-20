@@ -11,6 +11,13 @@ export default async function Page({params: {id}}: {params : {id : string}}){
         {users.map((user) => (
           <div key={user.id}>
             {user.id} - {user.password}
+            <span>courses: 
+                <div>
+                    {user.courses.map((course : string) => (
+                        course
+                    ))}
+                </div>
+            </span>
           </div>
         ))}
       
