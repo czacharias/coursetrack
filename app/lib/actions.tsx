@@ -26,7 +26,8 @@ export async function fetchUsers(id : string) {
       const data = await sql`
         SELECT
           id,
-          password
+          password, 
+          courses
         FROM USERS
         WHERE id = ${id}
         ORDER BY id ASC
