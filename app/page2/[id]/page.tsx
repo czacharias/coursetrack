@@ -12,11 +12,11 @@ export default async function Page({params: {id}}: {params : {id : string}}){
           <div key={user.id}>
             {user.id} - {user.password}
             <span>courses: 
+                {user.courses.map((course : string) => (
                 <div>
-                    {user.courses.map((course : string) => (
-                        course
-                    ))}
+                    { course}
                 </div>
+                ))}
             </span>
           </div>
         ))}
