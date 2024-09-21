@@ -13,7 +13,7 @@ export default async function Page({params: {id}}: {params : {id : string}}){
             {user.id} - {user.password}
             <span>courses: 
                 {user.courses.map((course : string) => (
-                <div>
+                <div key={course}>
                     { course}
                 </div>
                 ))}
