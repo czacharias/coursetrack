@@ -6,6 +6,7 @@ import { createInvoice, fetchUsers, getCourse, getAssignment, allUserInfo } from
 
 export default async function Page({params: {id}}: {params : {id : string}}){
     const users = await fetchUsers(id);
+    const course = await getCourse(users[0].courses[0]);
     const userData = await allUserInfo(id);
     return (
       <div>
@@ -30,9 +31,15 @@ export default async function Page({params: {id}}: {params : {id : string}}){
                 
           </div>
         ))}
-      
+
         <p className="text-2xl">
             Hello <strong>{id}</strong>
+        </p>
+        <p>
+            {course[0].name}
+        </p>
+        <p>
+            {course[0].assignments}
         </p>
         <div>
             {userData.userInfo.id}
