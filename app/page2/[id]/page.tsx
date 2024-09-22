@@ -7,7 +7,7 @@ import { createInvoice, fetchUsers, getCourse, getAssignment, allUserInfo } from
 export default async function Page({params: {id}}: {params : {id : string}}){
     const users = await fetchUsers(id);
     const course = await getCourse(users[0].courses[0]);
-    const assignments = await getAssignment(course[0].assginments[0]);
+    //const assignments = await getAssignment(course[0].assginments[0]);
     const userData = await allUserInfo(id);
     return (
       <div>
@@ -46,12 +46,12 @@ export default async function Page({params: {id}}: {params : {id : string}}){
             {userData.userInfo.id}
         </div>
         <div>
-            {assignments[0].description}
+            {/*assignments[0].description*/}
         </div>
         <div>
             {userData.userCourses.map((course : any) => (
                 <div key={course.id}>
-                    {course.name}
+                    {course.assginments}
                 </div>
             ))}
         </div>
