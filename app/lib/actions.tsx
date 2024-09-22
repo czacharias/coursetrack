@@ -101,7 +101,7 @@ export async function allUserInfo(userId:string){
             var courseInfo = await getCourse(course);
             userCourses.push(courseInfo[0]);
         };
-
+        /*
         const userAssignments: QueryResultRow[][] = [];
         for(let course of userCourses){
             for(let assignment of course.assignment){
@@ -109,8 +109,9 @@ export async function allUserInfo(userId:string){
                 userAssignments.push(assignmentInfo);
             }
         }
+            */
 
-        return {'userInfo' : userInfo, 'userCourses' : userCourses, 'userAssignments' : userAssignments};
+        return {'userInfo' : userInfo, 'userCourses' : userCourses, 'userAssignments' : []};
     }
     catch{
         throw new Error("Internal error");
