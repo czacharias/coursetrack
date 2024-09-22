@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { sql } from '@vercel/postgres';
+import { QueryResultRow, sql } from '@vercel/postgres';
 
 const FormSchema = z.object({
     id: z.string(),
@@ -40,4 +40,80 @@ export async function fetchUsers(id : string) {
       throw new Error('Failed to fetch all customers.');
     }
   }
+
+export async function getCourse(courseId : string){
+    try{
+        const data = await sql`
+        SELECT *
+        FROM COURSES
+        WHERE id = ${courseId}
+        `;
+
+        const course = data.rows;
+        return course;
+    }
+    catch(err){
+        throw new Error('dumbass');
+    }
+}
+
+export async function getAssignment(assignmentId:string){
+    try{
+        const data = await sql`
+        SELECT *
+        FROM ASSIGNMENTS
+        WHERE id = ${assignmentId}
+        `;
+
+        const assginment = data.rows;
+        return assginment;
+    }
+    catch{
+        throw new Error('Could not find assignment')
+    }
+}
+
+export async function authCourse(userId:string, courseId:string){
+    try {
+        const data = await sql`
+        SELECT courses
+        FROM USERS
+        WHERE id = ${userId}`;
+
+        const courses = data.rows;
+        if(courseId in Object.keys(courses)){
+            return true;
+        }
+        return false;
+    }
+    catch(err){
+        throw new Error("permission for course not granted")
+    }
+}
+
+export async function allUserInfo(userId:string){
+    try{
+        const data = await fetchUsers(userId);
+        const userInfo = data[0];
+        
+        const userCourses: QueryResultRow[] = [];
+        userInfo.courses.forEach(async (course : string) => {
+            var courseInfo = await getCourse(course);
+            userCourses.push(courseInfo[0]);
+        });
+
+        const userAssignments: QueryResultRow[][] = [];
+        userCourses.forEach(async (course : any) =>{
+            course.assignments.forEach(async (assignment : any) => {
+                var assignmentInfo = await getAssignment(assignment);
+                userAssignments.push(assignmentInfo);
+            })
+        })
+
+        return {'userInfo' : userInfo, 'userCourses' : userCourses, 'userAssignments' : userAssignments};
+    }
+    catch{
+        throw new Error("Internal error");
+    }
+}
   
