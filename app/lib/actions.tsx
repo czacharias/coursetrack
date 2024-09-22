@@ -102,11 +102,11 @@ export async function allUserInfo(userId:string){
             userCourses.push(courseInfo[0]);
         };
         
-        const userAssignments: QueryResultRow[][] = [];
+        const userAssignments: QueryResultRow[] = [];
         for(let course of userCourses){
             for(let assignment of course.assignment){
                 var assignmentInfo = await getAssignment(assignment);
-                userAssignments.push(assignmentInfo);
+                userAssignments.push(assignmentInfo[0]);
             }
         }
             
