@@ -68,7 +68,7 @@ export async function getAssignment(assignmentId:string){
         const assginment = data.rows;
         return assginment;
     }
-    catch{
+    catch(err){
         throw new Error('Could not find assignment')
     }
 }

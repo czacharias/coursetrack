@@ -45,9 +45,6 @@ export default async function Page({params: {id}}: {params : {id : string}}){
         <div>
             {userData.userInfo.id}
         </div>
-        <div>
-            {/*assignments[0].description*/}
-        </div>
         <div> 
             {userData.userCourses.map((course : any) => (
                 <div key={course.id}>
