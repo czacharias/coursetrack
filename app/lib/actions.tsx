@@ -100,17 +100,17 @@ export async function allUserInfo(userId:string){
             var courseInfo = await getCourse(course);
             userCourses.push(courseInfo[0]);
         };
-        /*
+        
         const userAssignments: QueryResultRow[] = [];
         for(let course of userCourses){
-            for(let assignment of course.assignment){
+            for(let assignment of course.assignments){
                 var assignmentInfo = await getAssignment(assignment);
                 userAssignments.push(assignmentInfo[0]);
             }
-        }*/
+        }
             
 
-        return {'userInfo' : userInfo, 'userCourses' : userCourses, 'userAssignments' : []};
+        return {'userInfo' : userInfo, 'userCourses' : userCourses, 'userAssignments' : userAssignments};
     }
     catch{
         throw new Error("Internal error");
