@@ -7,7 +7,6 @@ import { createInvoice, fetchUsers, getCourse, getAssignment, allUserInfo } from
 export default async function Page({params: {id}}: {params : {id : string}}){
     const users = await fetchUsers(id);
     const userData = await allUserInfo(id);
-    console.log(userData);
     return (
       <div>
         {users.map((user) => (
@@ -18,7 +17,12 @@ export default async function Page({params: {id}}: {params : {id : string}}){
                 <div key={course}>
                     { course}
                     <div className="font-10px">
-
+                        {userData.userAssignments.map((assignment : any) => (
+                            <div key='assignment'>
+                                {assignment.name}
+                                <p>{assignment.description}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
                 ))}
