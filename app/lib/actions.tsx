@@ -97,18 +97,18 @@ export async function allUserInfo(userId:string){
         const userInfo = data[0];
         
         const userCourses: QueryResultRow[] = [];
-        userInfo.courses.forEach(async (course : string) => {
+        for(let course of userInfo.courses){
             var courseInfo = await getCourse(course);
             userCourses.push(courseInfo[0]);
-        });
+        };
 
         const userAssignments: QueryResultRow[][] = [];
-        userCourses.forEach(async (course : any) =>{
-            course.assignments.forEach(async (assignment : any) => {
+        for(let course of userCourses){
+            for(let assignment of course.assignment){
                 var assignmentInfo = await getAssignment(assignment);
                 userAssignments.push(assignmentInfo);
-            })
-        })
+            }
+        }
 
         return {'userInfo' : userInfo, 'userCourses' : userCourses, 'userAssignments' : userAssignments};
     }
