@@ -62,14 +62,13 @@ export async function getAssignment(assignmentId:string){
         const data = await sql`
         SELECT *
         FROM ASSIGNMENTS
-        WHERE id = '${assignmentId}'
-        `;
+        WHERE id = ${assignmentId}`;
 
         const assginment = data.rows;
         return assginment;
     }
     catch(err){
-        throw new Error('Could not find assignment')
+        throw new Error("could not find assignment")
     }
 }
 
