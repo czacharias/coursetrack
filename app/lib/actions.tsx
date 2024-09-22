@@ -62,7 +62,7 @@ export async function getAssignment(assignmentId:string){
         const data = await sql`
         SELECT *
         FROM ASSIGNMENTS
-        WHERE id = ${assignmentId}
+        WHERE id = '${assignmentId}'
         `;
 
         const assginment = data.rows;
