@@ -48,10 +48,10 @@ export default async function Page({params: {id}}: {params : {id : string}}){
         <div>
             {/*assignments[0].description*/}
         </div>
-        <div>
+        <div> test:
             {userData.userCourses.map((course : any) => (
                 <div key={course.id}>
-                    {course.assginments}
+                    {course.assginments[0]}
                 </div>
             ))}
         </div>
