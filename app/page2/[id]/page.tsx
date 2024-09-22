@@ -27,13 +27,17 @@ export default async function Page({params: {id}}: {params : {id : string}}){
                 </div>
                 ))}
             </span>
-
+                
           </div>
         ))}
       
-      <p className="text-2xl">
-        Hello <strong>{id}</strong>
-      </p>
+        <p className="text-2xl">
+            Hello <strong>{id}</strong>
+        </p>
+        <div>
+            {userData.userInfo.id}
+            {userData.userCourses[0]}
+        </div>
       </div>
     )
 }
