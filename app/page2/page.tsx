@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { createInvoice } from "../lib/actions";
+import { createUser } from "../lib/actions";
 
 
 export default function Page(){

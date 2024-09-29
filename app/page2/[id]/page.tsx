@@ -1,11 +1,11 @@
 import { sql } from "@vercel/postgres";
-import { createInvoice, fetchUsers, getCourse, getAssignment, allUserInfo } from "@/app/lib/actions";
+import { createUser, fetchUser, getCourse, getAssignment, allUserInfo } from "@/app/lib/actions";
 
 
 
 
 export default async function Page({params: {id}}: {params : {id : string}}){
-    const users = await fetchUsers(id);
+    const users = await fetchUser(id);
     const course = await getCourse(users[0].courses[0]);
     const assignments = await getAssignment(course[0].assignments[0]);
     const userData = await allUserInfo(id);
