@@ -47,8 +47,7 @@ export async function createUser(id:string, password:string) {
     hashPassword(password, "", async (objs : any)=>{
         salt= await objs.salt;
         key= await objs.derivedKey;
-    })
-    .then( async () => {
+
         try{
 
             const data = await sql`
@@ -69,14 +68,13 @@ export async function createUser(id:string, password:string) {
             VALUES (${id}, ${salt}, ${key})
             `;
     
-            //revalidatePath('/app');
-            //redirect('/app');
+            revalidatePath('/');
+            redirect('/');
         }
         catch(err){
             throw new Error("User creation failed");
         }
     });
-    
 }
 
 export async function authUser(userId : string, password : string){

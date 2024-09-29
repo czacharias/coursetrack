@@ -42,7 +42,7 @@ export default function Page() {
     
     function onSubmit(values: z.infer<typeof formSchema>) {
 
-        console.log(values);
+        console.log(values.username, values.password);
         createUser(values.username, values.password);
 
     }

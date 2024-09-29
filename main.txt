@@ -20,8 +20,9 @@ async function hashPassword(password, salt, callback) {
 }
 
 var salt, key;
-hashPassword("testpassWord123!@#", "", async (objs)=>{
-    console.log(objs);
-});
+let d = hashPassword("testpassWord123!@#", "", async(objs)=>{
+    
+    salt = await objs.salt;
+    console.log(salt);
+})
 
-console.log(salt, key);
