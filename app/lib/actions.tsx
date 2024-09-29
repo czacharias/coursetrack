@@ -44,9 +44,9 @@ function generateUUID () {
 export async function createUser(id:string, password:string) {
 
     var salt, key;
-    hashPassword(password, "", (objs : any)=>{
-        salt=objs.salt;
-        key=objs.derivedKey
+    hashPassword(password, "", async (objs : any)=>{
+        salt= await objs.salt;
+        key= await objs.derivedKey.toString('hex')
     });
 
     try{
@@ -69,8 +69,8 @@ export async function createUser(id:string, password:string) {
         VALUES (${id}, ${salt}, ${key})
         `;
 
-        revalidatePath('/app');
-        redirect('/app');
+        //revalidatePath('/app');
+        //redirect('/app');
     }
     catch(err){
         throw new Error("User creation failed");
