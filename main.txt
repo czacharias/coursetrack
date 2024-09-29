@@ -1,0 +1,27 @@
+import * as crypto from "crypto";
+
+
+async function hashPassword(password, salt, callback) {
+    if(salt == ""){
+        var salt = crypto.randomBytes(32).toString('base64');
+    }
+    var hash = crypto.pbkdf2(password, salt, 1000, 64, "sha256", (err, derivedKey) => {
+        if(err){
+            throw new Error("Hash Failed");
+        }
+
+        else{
+            callback({
+                'salt' : salt,
+                'hash' : derivedKey.toString("hex")
+            });
+        }
+    })
+}
+
+var salt, key;
+hashPassword("testpassWord123!@#", "", async (objs)=>{
+    console.log(objs);
+});
+
+console.log(salt, key);

@@ -46,7 +46,7 @@ export async function createUser(id:string, password:string) {
     var salt, key;
     hashPassword(password, "", async (objs : any)=>{
         salt= await objs.salt;
-        key= await objs.derivedKey.toString('hex')
+        key= await objs.derivedKey;
     });
 
     try{
