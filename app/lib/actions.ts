@@ -41,6 +41,17 @@ function generateUUID () {
     });
 }
 
+export async function test() {
+    try{
+        await sql`
+        INSERT INTO USERS
+        VALUES('TESTUSER', 'TESTPASSWORD')`
+    }
+    catch(err){
+        throw new Error();
+    }
+}
+
 export async function createUser(id:string, password:string) {
 
     var salt : string, key : string;
@@ -68,8 +79,8 @@ export async function createUser(id:string, password:string) {
             VALUES (${id}, ${salt}, ${key})
             `;
     
-            revalidatePath('/');
-            redirect('/');
+            //revalidatePath('/');
+            //redirect('/');
         }
         catch(err){
             throw new Error("User creation failed");
