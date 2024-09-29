@@ -43,38 +43,39 @@ function generateUUID () {
 
 export async function createUser(id:string, password:string) {
 
-    var salt, key;
+    var salt : string, key : string;
     hashPassword(password, "", async (objs : any)=>{
         salt= await objs.salt;
         key= await objs.derivedKey;
-    });
+    })
+    .then( async () => {
+        try{
 
-    try{
-
-        const data = await sql`
-        SELECT (id)
-        FROM USERS
-        `
-        const users =data.rows;
-    
-        for(var d = 0; d < users.length; d++){
-            if(users[d].id == id){
-                return;
+            const data = await sql`
+            SELECT (id)
+            FROM USERS
+            `
+            const users =data.rows;
+        
+            for(var d = 0; d < users.length; d++){
+                if(users[d].id == id){
+                    return;
+                }
             }
+    
+    
+            await sql`
+            INSERT INTO USERS (id, salt, password)
+            VALUES (${id}, ${salt}, ${key})
+            `;
+    
+            //revalidatePath('/app');
+            //redirect('/app');
         }
-
-
-        await sql`
-        INSERT INTO USERS (id, salt, password)
-        VALUES (${id}, ${salt}, ${key})
-        `;
-
-        //revalidatePath('/app');
-        //redirect('/app');
-    }
-    catch(err){
-        throw new Error("User creation failed");
-    }
+        catch(err){
+            throw new Error("User creation failed");
+        }
+    });
     
 }
 
