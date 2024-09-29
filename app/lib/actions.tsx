@@ -23,7 +23,7 @@ async function hashPassword(password:string, salt : string, callback : Function)
         else{
             callback({
                 'salt' : salt,
-                'hash' : derivedKey
+                'hash' : derivedKey.toString("hex")
             });
         }
     })
