@@ -69,13 +69,14 @@ export async function createUser(id:string, password:string) {
             VALUES (${id}, ${salt}, ${key})
             `;
     
-            //revalidatePath('/');
-            //redirect('/');
+            
         }
         catch(err){
             throw new Error("User creation failed");
         }
     });
+    revalidatePath('/page2');
+    redirect('/page2');
 }
 
 export async function authUser(userId : string, password : string){

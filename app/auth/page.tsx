@@ -83,7 +83,7 @@ export default function Page() {
                     </FormItem>
                 )}
                 />
-                <Button className="m-5" type="submit">Submit</Button>
+                <Button className="my-6" type="submit">Submit</Button>
             </form>
         </Form>
     </div>

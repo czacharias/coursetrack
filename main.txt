@@ -23,6 +23,13 @@ var salt, key;
 let d = hashPassword("testpassWord123!@#", "", async(objs)=>{
     
     salt = await objs.salt;
-    console.log(salt);
+    console.log(await objs.hash);
+
+    try{
+        console.log(typeof(salt));
+    }
+    catch(err){
+        console.log("ggs")
+    }
 })
 
