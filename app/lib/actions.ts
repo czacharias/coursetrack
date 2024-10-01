@@ -90,12 +90,28 @@ export async function authUser(userId : string, password : string){
 
         var user = data.rows[0];
         var salt = user.salt;
+
+        var validLogin = false;
         
-        return hashPassword(password, salt, (objs : any)=>{return objs.derivedKey;}) == user.password;
+        hashPassword(password, salt, (objs : any)=>{
+            var hashed = objs.hash;
+            if(hashed == user.passwod){
+                validLogin = true;
+            }
+        ;
+        });
 
     }
     catch(err){
         throw new Error("Auth Failed")
+    }
+    if(validLogin){
+        revalidatePath('/page2');
+        redirect('/page2');
+    }
+    else{
+        revalidatePath('/auth/login');
+        redirect('/auth/login')
     }
 }
 
