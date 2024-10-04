@@ -1,9 +1,16 @@
-"use client"
+'use client';
  
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { authUser, createUser } from "../../lib/actions"
+import { createUser } from "../../lib/actions"
+import {
+  AtSymbolIcon,
+  KeyIcon,
+  ExclamationCircleIcon,
+} from '@heroicons/react/24/outline';
+
+import { useActionState } from "react";
  
 import { Button } from "@/components/ui/button"
 import {
@@ -17,6 +24,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { redirect } from "next/dist/server/api-utils"
+import { authenticate } from "../../lib/actions"
  
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -39,17 +47,17 @@ export default function Page() {
           password: "",
         },
     })
-    
-    async function onSubmit(values: z.infer<typeof formSchema>) {
 
-        console.log(values.username, values.password);
-        authUser(values.username, values.password);
-    }
+    const [errorMessage, formAction, isPending] = useActionState(
+      authenticate,
+      undefined,
+    );
+  
  
   return (
     <div className="flex justify-center items-center min-h-dvh">
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+            <form action={ formAction } className="space-y-3">
                 <FormField
                 control={form.control}
                 name="username"
@@ -82,6 +90,14 @@ export default function Page() {
                     </FormItem>
                 )}
                 />
+                <div className="flex h-8 items-end space-x-1">
+                  {errorMessage && (
+                    <>
+                      <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+                      <p className="text-sm text-red-500">{errorMessage}</p>
+                    </>
+                  )}
+                </div>
                 <Button className="my-6" type="submit">Submit</Button>
             </form>
         </Form>

@@ -5,13 +5,17 @@ import { QueryResultRow, sql } from '@vercel/postgres';
 import * as crypto from "crypto";
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { signIn } from '@/auth';
+import { AuthError } from 'next-auth';
+import bcrypt from "bcrypt";
+import { BriefcaseIcon } from '@heroicons/react/24/outline';
 
 const FormSchema = z.object({
     id: z.string(),
     password : z.string()
 });
 
-async function hashPassword(password:string, salt : string, callback : Function) {
+export async function hashPassword(password:string, salt : string, callback : Function) {
     if(salt == ""){
         var salt = crypto.randomBytes(32).toString('base64');
     }
@@ -45,74 +49,38 @@ function generateUUID () {
 export async function createUser(id:string, password:string) {
 
     var salt : string, key : string;
-    hashPassword(password, "", async (objs : any)=>{
-        salt= await objs.salt;
-        key= await objs.hash;
 
-        try{
+    salt = await bcrypt.genSalt(10);
+    key = await bcrypt.hash(password, salt);
 
-            const data = await sql`
-            SELECT (id)
-            FROM USERS
-            `
-            const users =data.rows;
-        
-            for(var d = 0; d < users.length; d++){
-                if(users[d].id == id){
-                    return;
-                }
-            }
-    
-    
-            await sql`
-            INSERT INTO USERS (id, salt, password)
-            VALUES (${id}, ${salt}, ${key})
-            `;
-    
-            
-        }
-        catch(err){
-            throw new Error("User creation failed");
-        }
-    });
-    revalidatePath('/page2');
-    redirect('/page2');
-}
-
-export async function authUser(userId : string, password : string){
     try{
 
         const data = await sql`
-        SELECT *
+        SELECT (id)
         FROM USERS
-        WHERE id=${userId}
+        `
+        const users =data.rows;
+    
+        for(var d = 0; d < users.length; d++){
+            if(users[d].id == id){
+                return;
+            }
+        }
+
+
+        await sql`
+        INSERT INTO USERS (id, salt, password)
+        VALUES (${id}, ${salt}, ${key})
         `;
 
-        var user = data.rows[0];
-        var salt = user.salt;
-
-        var validLogin = false;
         
-        hashPassword(password, salt, (objs : any)=>{
-            var hashed = objs.hash;
-            if(hashed == user.passwod){
-                validLogin = true;
-            }
-        ;
-        });
-
     }
     catch(err){
-        throw new Error("Auth Failed")
+        throw new Error("User creation failed");
     }
-    if(validLogin){
-        revalidatePath('/page2');
-        redirect('/page2');
-    }
-    else{
-        revalidatePath('/auth/login');
-        redirect('/auth/login')
-    }
+
+    revalidatePath('/page2');
+    redirect('/page2');
 }
 
 export async function createClass(name : string){
@@ -155,16 +123,13 @@ export async function createAssignment(name:string, description:string, classId:
 export async function fetchUser(id : string) {
     try {
       const data = await sql`
-        SELECT
-          id,
-          password, 
-          courses
+        SELECT * 
         FROM USERS
         WHERE id = ${id}
         ORDER BY id ASC
       `;
   
-      const customers = data.rows;
+      const customers = data.rows[0];
       return customers;
     } catch (err) {
       console.error('Database Error:', err);
@@ -180,11 +145,11 @@ export async function getCourse(courseId : string){
         WHERE id = ${courseId}
         `;
 
-        const course = data.rows;
+        const course = data.rows[0];
         return course;
     }
     catch(err){
-        throw new Error('dumbass');
+        throw new Error('Cannot find course');
     }
 }
 
@@ -224,13 +189,18 @@ export async function authCourse(userId:string, courseId:string){
 export async function allUserInfo(userId:string){
     try{
         const data = await fetchUser(userId);
-        const userInfo = data[0];
-        
+        const userInfo = data;
+        console.log(" ======== USER INFO ========");
+        console.log(userInfo);
+
         const userCourses: QueryResultRow[] = [];
         for(let course of userInfo.courses){
             var courseInfo = await getCourse(course);
-            userCourses.push(courseInfo[0]);
+            userCourses.push(courseInfo);
         };
+
+        console.log(" ======== USER COURSES ========");
+        console.log(userCourses);
         
         const userAssignments: QueryResultRow[] = [];
         for(let course of userCourses){
@@ -240,11 +210,31 @@ export async function allUserInfo(userId:string){
             }
         }
             
+        console.log(" ======== USER ASSIGNMENTS ========");
+        console.log(userAssignments);
 
-        return {'userInfo' : userInfo, 'userCourses' : userCourses, 'userAssignments' : userAssignments};
+        return {'user' : userInfo, 'courses' : userCourses, 'assignments' : userAssignments};
     }
     catch{
         throw new Error("Internal error");
     }
 }
   
+export async function authenticate(
+    prevState: string | undefined,
+    formData: FormData,
+  ) {
+    try {
+      await signIn('credentials', formData);
+    } catch (error) {
+      if (error instanceof AuthError) {
+        switch (error.type) {
+          case 'CredentialsSignin':
+            return 'Invalid credentials.';
+          default:
+            return 'Something went wrong.';
+        }
+      }
+      throw error;
+    }
+  }
