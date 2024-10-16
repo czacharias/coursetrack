@@ -5,10 +5,10 @@ import { QueryResultRow, sql } from '@vercel/postgres';
 import * as crypto from "crypto";
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { BriefcaseIcon } from '@heroicons/react/24/outline';
+import { auth, signOut, signIn } from "@/auth";
 
 const FormSchema = z.object({
     id: z.string(),
@@ -69,8 +69,8 @@ export async function createUser(id:string, password:string) {
 
 
         await sql`
-        INSERT INTO USERS (id, salt, password)
-        VALUES (${id}, ${salt}, ${key})
+        INSERT INTO USERS (id, salt, password, courses)
+        VALUES (${id}, ${salt}, ${key}, '{}')
         `;
 
         
@@ -83,14 +83,14 @@ export async function createUser(id:string, password:string) {
     redirect('/page2');
 }
 
-export async function createClass(name : string){
+export async function createClass(name : string, subject : string){
 
     const id = generateUUID()
 
     try{
         await sql`
-        INSERT INTO CLASSES
-        VALUES(${id}, ${name})`;
+        INSERT INTO COURSES (id, name, subject, assignments)
+        VALUES(${id}, ${name}, ${subject}, '{}')`;
     }
     catch(err){
         throw new Error("Failed to create new class");
@@ -120,7 +120,7 @@ export async function createAssignment(name:string, description:string, classId:
 
 }
 
-export async function fetchUser(id : string) {
+export async function fetchUser(id : string){
     try {
       const data = await sql`
         SELECT * 
@@ -191,10 +191,12 @@ export async function allUserInfo(userId:string){
         const data = await fetchUser(userId);
         const userInfo = data;
         console.log(" ======== USER INFO ========");
+        console.log(userId);
         console.log(userInfo);
 
         const userCourses: QueryResultRow[] = [];
         for(let course of userInfo.courses){
+            console.log("course =>> " + course);
             var courseInfo = await getCourse(course);
             userCourses.push(courseInfo);
         };
@@ -219,7 +221,7 @@ export async function allUserInfo(userId:string){
         throw new Error("Internal error");
     }
 }
-  
+
 export async function authenticate(
     prevState: string | undefined,
     formData: FormData,

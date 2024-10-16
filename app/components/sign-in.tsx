@@ -1,10 +1,5 @@
-"use client"
- 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { createUser } from "../../lib/actions"
- 
+"use client";
+import { auth, signOut, signIn } from "@/auth"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -16,48 +11,52 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { redirect } from "next/dist/server/api-utils"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useActionState } from "react"
-import { authenticate } from "../../lib/actions" 
-
-const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  password: z.string()
-    .min(1, { message: 'Must have at least 1 character' })
-    .regex(new RegExp(
-        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/
-      ), {
-      message: 'Your password is not valid',
-    }),
-})
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { authenticate } from "../lib/actions";
  
-export default function Page() {
+const formSchema = z.object({
+    id: z.string().min(2, {
+      message: "Username must be at least 2 characters.",
+    }),
+    password: z.string()
+      .min(1, { message: 'Must have at least 1 character' })
+      .regex(new RegExp(
+          /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/
+        ), {
+        message: 'Your password is not valid',
+      }),
+  })
 
+
+
+export default function SignIn() {
+    
+    const [errorMessage, formAction, isPending] = useActionState(
+        authenticate,
+        undefined
+    );
 
     const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-          username: "",
-          password: "",
-        },
-    })
-    
-    function onSubmit(values: z.infer<typeof formSchema>) {
-
-        console.log(values.username, values.password);
-        createUser(values.username, values.password);
-
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      id: "",
+      password: "",
     }
- 
+    })
+
+    
+
   return (
-    <div className="flex justify-center items-center min-h-dvh">
+    <div>
+        <div className="flex justify-center items-center min-h-dvh">
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+            <form action={ formAction } className="space-y-3">
                 <FormField
                 control={form.control}
-                name="username"
+                name="id"
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>Username</FormLabel>
@@ -65,7 +64,7 @@ export default function Page() {
                         This is your public display name.
                     </FormDescription>
                     <FormControl>
-                        <Input placeholder="" {...field} />
+                        <Input type="id" placeholder="" {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -91,6 +90,25 @@ export default function Page() {
             </form>
         </Form>
     </div>
+    </div>
     
   )
-}
+} 
+/*
+<form
+            action={async (formData) => {
+                "use server"
+                await signIn("credentials", formData)
+            }}
+        >
+            <label>
+                Email
+                <input name="id" type="id" />
+            </label>
+            <label>
+                Password
+                <input name="password" type="password" />
+            </label>
+            <button>Sign In</button>
+        </form>
+*/

@@ -1,12 +1,12 @@
 'use client';
-import SignIn from "@/app/components/sign-in";
+import CreateCourse from "@/app/components/create-course";
 
  
 export default function Page() {
 
   return (
     <div className="flex justify-center items-center min-h-dvh">
-        <SignIn></SignIn>
+        <CreateCourse></CreateCourse>
     </div>
     
   )

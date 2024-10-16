@@ -1,59 +1,81 @@
-import NextAuth from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-import { authConfig } from './auth.config';
-import { z } from 'zod';
-import { sql } from '@vercel/postgres';
-type User = {
-    id: string;
-    name: string;
-    salt: string;
-    password: string;
+
+import NextAuth from "next-auth"
+import Google from "next-auth/providers/google"
+import Github from "next-auth/providers/github"
+import Credentials from "next-auth/providers/credentials"
+import bcrypt from "bcryptjs";
+import credentials from "next-auth/providers/credentials";
+import { fetchUser } from "./app/lib/actions";
+import { type DefaultSession } from "next-auth"
+
+declare module "next-auth" {
+    interface Session {
+      user: {
+        id: string,
+        password: string,
+        salt: string,
+        courses: string[],
+      } & DefaultSession["user"]
+    }
   }
-import bcrypt from 'bcrypt';
- 
-async function getUser(id : string): Promise<User | undefined> {
-  try {
-    const user = await sql<User>`SELECT * FROM USERS WHERE id=${id}`;
-    return user.rows[0];
-  } catch (error) {
-    console.error('Failed to fetch user:', error);
-    throw new Error('Failed to fetch user.');
-  }
-}
-
-async function getHash(password : string, salt : string) {
-    
-}
 
 
-export const { auth, signIn, signOut } = NextAuth({
-  ...authConfig,
+export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
+    Google,
+    Github,
     Credentials({
-      async authorize(credentials) {
-        const parsedCredentials = z
-          .object({ username: z.string(), password: z.string().min(6)})
-          .safeParse(credentials);
-
-        console.log(credentials);
-
-        if (parsedCredentials.success) {
-
-            console.log(parsedCredentials);
-
-            const { username, password } = parsedCredentials.data;
-            const user = await getUser(username);
+        credentials: {
+            id: {},
+            password: {},
+        },
+        authorize: async (credentials : any) =>{
+            console.log("==============CREDENTIALS==============");
+            console.log(credentials);
+            console.log("=================USER=================");
+            const user : any = await fetchUser(credentials.id);
             console.log(user);
-            if (!user) return null;
-            
-            const hashedPass = await bcrypt.hash(password, user.salt)
+            if(!user){
+                throw new Error("User not found");
+            }
 
-            if (hashedPass == user.password) return user;
+            const hashpass = await bcrypt.hash(credentials.password, user.salt);
+            console.log("=================PASS=================");
+            console.log(hashpass);
+
+            if(user.password == hashpass){
+                return user;
+            }
+            throw new Error("Invalid Password");
+
         }
- 
-        console.log('Invalid credentials');
-        return null;
+    })
+    ],
+    callbacks: {
+        async jwt({token, user}) {
+            if (user) {
+              token.id = user.id;
+            }
+            return token
+          },
+        async session({session, token}) {
+            // console.log('token', token);
+            session.user.id = token.id as string;
+            return session
+          },
+        authorized({ auth, request: { nextUrl } }){
+            // const isLoggedIn = !!auth?.user;
+            // const isOnDashboard = nextUrl.pathname.startsWith('/info') || nextUrl.pathname.startsWith('/auth');
+            // if (isOnDashboard) {
+            //     if (isLoggedIn) {
+            //         return true;
+            //     }
+            //     return false; 
+            // } 
+            // else if (isLoggedIn) {
+            //     return Response.redirect(new URL(`/info/${auth.user?.id}`, nextUrl));
+            // }
+            return true;
+        }
       },
-    }),
-  ],
-});
+})
