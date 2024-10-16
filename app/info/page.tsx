@@ -16,7 +16,7 @@ export default async function Page(){
             <a>Courses: </a>
             {
                 (data?.user.courses) && <div>{ data?.user.courses.map((course : any) => (
-                <a>{course}</a>
+                <a key={course}>{course}</a>
             )) }</div>
             }
             
