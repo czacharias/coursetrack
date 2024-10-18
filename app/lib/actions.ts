@@ -160,11 +160,22 @@ export async function getAssignment(assignmentId:string){
         FROM ASSIGNMENTS
         WHERE id = ${assignmentId}`;
 
-        const assginment = data.rows;
+        const assginment = data.rows[0];
         return assginment;
     }
     catch(err){
         throw new Error("could not find assignment")
+    }
+}
+
+export async function addCourse(userId:string, courseId:string){
+    try{
+        await sql`
+        UPDATE USERS
+        SET id=id password=password salt=salt courses=array_append(courses, ${courseId})`
+    }
+    catch(err){
+        throw new Error("course could not be added");
     }
 }
 
